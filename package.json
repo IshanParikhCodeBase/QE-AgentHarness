@@ -1,0 +1,29 @@
+{
+  "name": "qai",
+  "version": "0.1.0",
+  "description": "Quality Engineering AI Agent Harness",
+  "type": "module",
+  "bin": {
+    "qai": "./bin/qai.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/cli/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.55.0",
+    "@google/generative-ai": "^0.24.0",
+    "@inquirer/prompts": "^7.4.0",
+    "chalk": "^5.4.1",
+    "commander": "^12.1.0",
+    "openai": "^4.103.0",
+    "ora": "^8.2.0",
+    "pdf-parse": "^1.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pdf-parse": "^1.1.4",
+    "tsx": "^4.19.0",
+    "typescript": "^5.8.0"
+  }
+}
