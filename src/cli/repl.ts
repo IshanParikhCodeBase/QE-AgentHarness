@@ -203,6 +203,22 @@ async function handleDraftTestCases(): Promise<void> {
     });
   }
 
+  // ── Step 3: Output file ───────────────────────────────────────────────────
+  console.log('');
+  console.log(chalk.dim('─'.repeat(W)));
+  console.log(chalk.bold('  Output file') + chalk.dim('  ·  test cases will be written here'));
+  console.log(chalk.dim('─'.repeat(W)));
+
+  const outputFile = await input({
+    message: chalk.reset('File path  (default: test-cases.md)'),
+    theme: {
+      prefix: chalk.cyan('>'),
+      style: { answer: (t: string) => chalk.dim(t) },
+    },
+  });
+
+  const resolvedOutput = (outputFile.trim() || 'test-cases.md');
+
   // ── Build feature doc ─────────────────────────────────────────────────────
   let featureDoc = featureDescription.trim();
 
@@ -211,34 +227,64 @@ async function handleDraftTestCases(): Promise<void> {
     if (extracted) featureDoc += '\n\n' + extracted;
   }
 
-  // ── Run agent ─────────────────────────────────────────────────────────────
-  printWorkingHeader('Test Scenario Drafter');
+  // ── Agent loop — run once then ask for more ───────────────────────────────
+  while (true) {
+    // Read current file content before each run (picks up what was just written)
+    let existingContent: string | undefined;
+    if (fs.existsSync(resolvedOutput)) {
+      existingContent = fs.readFileSync(resolvedOutput, 'utf8');
+      if (existingContent) hint(`  Appending to existing file — no duplicates`);
+    }
 
-  let spinner = createSpinner('consulting memory...');
-  spinner.start();
+    printWorkingHeader('Test Scenario Drafter');
 
-  try {
-    const result = await ScenarioDrafterAgent.run(
-      { featureDoc },
-      {
-        provider,
-        activeClient: cfg.activeClient,
-        onToolCall: (_toolName, toolInput) => {
-          spinner.stop();
-          printToolCall('read_memory', (toolInput as { query: string }).query);
-          spinner = createSpinner('processing...');
-          spinner.start();
+    let spinner = createSpinner('consulting memory...');
+    spinner.start();
+
+    try {
+      const result = await ScenarioDrafterAgent.run(
+        { featureDoc, outputFile: resolvedOutput, existingContent },
+        {
+          provider,
+          activeClient: cfg.activeClient,
+          onToolCall: (_toolName, toolInput) => {
+            spinner.stop();
+            if (_toolName === 'read_memory') {
+              printToolCall('read_memory', (toolInput as { query: string }).query);
+              spinner = createSpinner('drafting test cases...');
+            } else if (_toolName === 'file_write') {
+              printToolCall('file_write', (toolInput as { path: string }).path);
+              spinner = createSpinner('writing file...');
+            } else {
+              spinner = createSpinner('processing...');
+            }
+            spinner.start();
+          },
         },
-      },
-    );
+      );
 
-    spinner.stop();
-    printDivider();
-    console.log(renderMarkdown(result));
-    printDivider();
-  } catch (err) {
-    spinner.stop();
-    failure((err as Error).message);
+      spinner.stop();
+      printDivider();
+      console.log(renderMarkdown(result));
+      printDivider();
+      hint(`  Saved → ${resolvedOutput}`);
+    } catch (err) {
+      spinner.stop();
+      failure((err as Error).message);
+      break;
+    }
+
+    // Ask if user wants 25 more
+    console.log('');
+    const more = await input({
+      message: chalk.reset('Want more test cases? (y/n)'),
+      theme: {
+        prefix: chalk.cyan('>'),
+        style: { answer: (t: string) => chalk.white(t) },
+      },
+    });
+
+    if (more.trim().toLowerCase() !== 'y') break;
   }
 }
 
