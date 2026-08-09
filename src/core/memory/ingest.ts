@@ -1,6 +1,5 @@
-import { randomUUID } from 'crypto';
 import { LLMProvider } from '../llm/types.js';
-import { readMemory, writeMemory } from './store.js';
+import { appendRule, appendFeature, appendConvention } from './store.js';
 
 interface ExtractedData {
   features: Array<{ name: string; description: string; tags: string[] }>;
@@ -50,20 +49,15 @@ export async function ingestDocument(
     throw new Error('Could not parse structured data from LLM response. Try again or simplify the document.');
   }
 
-  const memory = readMemory(clientName);
-  const now = new Date().toISOString();
-
   for (const f of extracted.features ?? []) {
-    memory.features.push({ id: randomUUID(), ...f, addedAt: now });
+    appendFeature(clientName, f.name, f.description, f.tags ?? []);
   }
   for (const r of extracted.businessRules ?? []) {
-    memory.businessRules.push({ id: randomUUID(), ...r, addedAt: now });
+    appendRule(clientName, r.rule, r.context, r.tags ?? []);
   }
   for (const c of extracted.testConventions ?? []) {
-    memory.testConventions.push({ id: randomUUID(), ...c, addedAt: now });
+    appendConvention(clientName, c.convention);
   }
-
-  writeMemory(clientName, memory);
 
   return {
     features: extracted.features?.length ?? 0,

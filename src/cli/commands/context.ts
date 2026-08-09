@@ -1,8 +1,5 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
-import fs from 'fs';
-import os from 'os';
-import path from 'path';
 import { readConfig, writeConfig } from '../../core/config/store.js';
 import { listClients } from '../../core/memory/store.js';
 import { success, hint } from '../ui.js';
@@ -18,10 +15,8 @@ export function registerContextCommands(program: Command): void {
       const cfg = readConfig();
       cfg.activeClient = slug;
       writeConfig(cfg);
-      const clientDir = path.join(os.homedir(), '.qai', 'clients', slug);
-      fs.mkdirSync(clientDir, { recursive: true });
       success(`Active client → ${chalk.bold(slug)}`);
-      hint(`  memory · ~/.qai/clients/${slug}/memory.json`);
+      hint(`  memory · harness/memory/${slug}/`);
     });
 
   cmd
@@ -33,17 +28,14 @@ export function registerContextCommands(program: Command): void {
         console.log(chalk.dim('No active client  ·  run: qai context set <name>'));
       } else {
         console.log(
-          chalk.green('●') +
-            ' ' +
-            chalk.bold(cfg.activeClient) +
-            chalk.dim('  ·  active client'),
+          chalk.green('●') + ' ' + chalk.bold(cfg.activeClient) + chalk.dim('  ·  active client'),
         );
       }
     });
 
   cmd
     .command('list')
-    .description('List all known clients')
+    .description('List all clients with memory in harness/memory/')
     .action(() => {
       const clients = listClients();
       const cfg = readConfig();

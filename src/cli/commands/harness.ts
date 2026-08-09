@@ -5,14 +5,12 @@ import path from 'path';
 import { loadAgentDefs } from '../../core/harness/loader.js';
 import { getAdapter, PROVIDER_TARGETS } from '../../core/harness/adapters/index.js';
 import { ProviderTarget } from '../../core/harness/types.js';
-import { readConfig } from '../../core/config/store.js';
-import { readMemory } from '../../core/memory/store.js';
 import { success, failure, hint } from '../ui.js';
 
 const AGENTS_DIR = 'agents';
 const VALID_PROVIDERS = PROVIDER_TARGETS.join(' | ');
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function resolveProjectRoot(rootOpt?: string): string {
   return rootOpt ? path.resolve(rootOpt) : process.cwd();
@@ -71,11 +69,11 @@ function initMemoryDir(projectRoot: string): void {
         '',
         '## Adding memory',
         '',
-        '- **From the qai CLI:** `qai harness export-memory --client <name>`',
-        '- **Manually:** create a subfolder and add markdown files',
-        '- **From a document:** `qai memory ingest <file>` then re-export',
+        '- **Via CLI (interactive):** `qai memory add-rule`',
+        '- **Via CLI (from a document):** `qai memory ingest <file>`',
+        '- **Manually:** create a subfolder and write markdown files directly',
         '',
-        'Rules in this directory inform the test-case-drafter and any other agents that read memory.',
+        'All files are plain markdown — commit them to version control so the whole team shares the same memory.',
       ].join('\n'),
       'utf8',
     );
@@ -117,7 +115,7 @@ export function registerHarnessCommands(program: Command): void {
       }
       console.log(`  ${chalk.green('✓')} harness/memory/`);
       console.log('');
-      hint('Next: populate memory with  qai harness export-memory  or  qai memory add-rule');
+      hint('Next: set a client with  qai context set <name>  then  qai memory add-rule');
 
       if (target === 'claude-code') {
         hint('Restart Claude Code in this project to pick up the new subagent(s).');
@@ -181,80 +179,5 @@ export function registerHarnessCommands(program: Command): void {
           console.log('');
         }
       }
-    });
-
-  // ── harness export-memory ─────────────────────────────────────────────────
-  cmd
-    .command('export-memory')
-    .description('Export client memory from ~/.qai into harness/memory/ (version-controlled)')
-    .option('-c, --client <name>', 'Client slug to export (defaults to active client)')
-    .option('-r, --root <path>', 'Project root (defaults to cwd)')
-    .action((opts: { client?: string; root?: string }) => {
-      const cfg = readConfig();
-      const clientName = opts.client ?? cfg.activeClient;
-
-      if (!clientName) {
-        failure('No client specified and no active client set.');
-        hint('Run: qai context set <name>  or pass  --client <name>');
-        process.exit(1);
-      }
-
-      const memory = readMemory(clientName);
-      const projectRoot = resolveProjectRoot(opts.root);
-      const clientDir = path.join(projectRoot, 'harness', 'memory', clientName);
-      fs.mkdirSync(clientDir, { recursive: true });
-
-      // rules.md
-      const rulesLines = [
-        `# Business Rules — ${clientName}`,
-        '',
-        memory.businessRules.length === 0
-          ? '_No business rules recorded yet._'
-          : memory.businessRules
-              .map(
-                (r, i) =>
-                  `## BR-${String(i + 1).padStart(3, '0')} — ${r.rule}\n\n**Applies when:** ${r.context}${r.tags.length ? `\n\n**Tags:** ${r.tags.join(', ')}` : ''}`,
-              )
-              .join('\n\n'),
-      ];
-      fs.writeFileSync(path.join(clientDir, 'rules.md'), rulesLines.join('\n'), 'utf8');
-
-      // features.md
-      const featuresLines = [
-        `# Features — ${clientName}`,
-        '',
-        memory.features.length === 0
-          ? '_No features recorded yet._'
-          : memory.features
-              .map(
-                (f) =>
-                  `## ${f.name}\n\n${f.description}${f.tags.length ? `\n\n**Tags:** ${f.tags.join(', ')}` : ''}`,
-              )
-              .join('\n\n'),
-      ];
-      fs.writeFileSync(path.join(clientDir, 'features.md'), featuresLines.join('\n'), 'utf8');
-
-      // conventions.md
-      const conventionsLines = [
-        `# Test Conventions — ${clientName}`,
-        '',
-        memory.testConventions.length === 0
-          ? '_No test conventions recorded yet._'
-          : memory.testConventions.map((c) => `- ${c.convention}`).join('\n'),
-      ];
-      fs.writeFileSync(
-        path.join(clientDir, 'conventions.md'),
-        conventionsLines.join('\n'),
-        'utf8',
-      );
-
-      console.log('');
-      console.log(chalk.bold('export-memory') + chalk.dim(`  ·  ${clientName}`));
-      console.log(chalk.dim('─'.repeat(42)));
-      console.log(`  ${chalk.green('✓')} harness/memory/${clientName}/rules.md  ${chalk.dim('(' + memory.businessRules.length + ' rules)')}`);
-      console.log(`  ${chalk.green('✓')} harness/memory/${clientName}/features.md  ${chalk.dim('(' + memory.features.length + ' features)')}`);
-      console.log(`  ${chalk.green('✓')} harness/memory/${clientName}/conventions.md  ${chalk.dim('(' + memory.testConventions.length + ' conventions)')}`);
-      console.log('');
-      success('Memory exported — commit harness/memory/ to version control');
     });
 }
