@@ -2,6 +2,8 @@ import { Command } from 'commander';
 import { registerConfigCommands } from './commands/config.js';
 import { registerContextCommands } from './commands/context.js';
 import { registerMemoryCommands } from './commands/memory.js';
+import { registerHarnessCommands } from './commands/harness.js';
+
 const program = new Command();
 
 program
@@ -12,11 +14,6 @@ program
 registerConfigCommands(program);
 registerContextCommands(program);
 registerMemoryCommands(program);
+registerHarnessCommands(program);
 
-// No subcommand → launch interactive REPL
-if (process.argv.length <= 2) {
-  const { startRepl } = await import('./repl.js');
-  await startRepl();
-} else {
-  program.parse(process.argv);
-}
+program.parse(process.argv);
