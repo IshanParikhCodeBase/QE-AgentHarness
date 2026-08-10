@@ -1,12 +1,9 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { input } from '@inquirer/prompts';
-import fs from 'fs';
 import { readConfig } from '../../core/config/store.js';
 import { appendRule, appendFeature, appendConvention, readMemoryFile } from '../../core/memory/store.js';
-import { ingestDocument } from '../../core/memory/ingest.js';
-import { getProvider } from '../../core/llm/factory.js';
-import { success, failure, hint, createSpinner } from '../ui.js';
+import { success, failure, hint } from '../ui.js';
 
 function requireClient(): string {
   const cfg = readConfig();
@@ -80,48 +77,6 @@ export function registerMemoryCommands(program: Command): void {
       success(`Convention added  ·  harness/memory/${clientName}/conventions.md`);
     });
 
-  // ── ingest ────────────────────────────────────────────────────────────────
-  cmd
-    .command('ingest <file>')
-    .description('Extract rules, features, and conventions from a document using LLM')
-    .action(async (file: string) => {
-      const clientName = requireClient();
-
-      if (!fs.existsSync(file)) {
-        failure(`File not found: ${file}`);
-        process.exit(1);
-      }
-
-      const content = fs.readFileSync(file, 'utf8');
-      const cfg = readConfig();
-
-      let provider;
-      try {
-        provider = getProvider(cfg);
-      } catch (err) {
-        failure((err as Error).message);
-        process.exit(1);
-      }
-
-      console.log('');
-      const spinner = createSpinner(`extracting from ${chalk.bold(file)}...`);
-      spinner.start();
-
-      try {
-        const result = await ingestDocument(content, clientName, provider);
-        spinner.stop();
-        console.log('');
-        success('Extraction complete  ·  written to harness/memory/' + clientName + '/');
-        hint(`  ${result.features} features`);
-        hint(`  ${result.businessRules} business rules`);
-        hint(`  ${result.testConventions} test conventions`);
-      } catch (err) {
-        spinner.stop();
-        failure((err as Error).message);
-        process.exit(1);
-      }
-    });
-
   // ── show ──────────────────────────────────────────────────────────────────
   cmd
     .command('show')
@@ -144,7 +99,6 @@ export function registerMemoryCommands(program: Command): void {
         if (!content) {
           console.log(chalk.dim('  none yet'));
         } else {
-          // Print each non-header, non-empty line indented
           for (const line of content.split('\n').slice(1)) {
             if (line.trim() === '') continue;
             console.log('  ' + chalk.dim(line));
