@@ -1,31 +1,19 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { input } from '@inquirer/prompts';
-import { readConfig } from '../../core/config/store.js';
 import { appendRule, appendFeature, appendConvention, readMemoryFile } from '../../core/memory/store.js';
-import { success, failure, hint } from '../ui.js';
-
-function requireClient(): string {
-  const cfg = readConfig();
-  if (!cfg.activeClient) {
-    failure('No active client  ·  run: qai context set <name>');
-    process.exit(1);
-  }
-  return cfg.activeClient;
-}
+import { success, hint } from '../ui.js';
 
 export function registerMemoryCommands(program: Command): void {
-  const cmd = program.command('memory').description('Manage client memory');
+  const cmd = program.command('memory').description('Manage project memory');
 
   // ── add-rule ──────────────────────────────────────────────────────────────
   cmd
     .command('add-rule')
-    .description('Add a business rule to harness/memory/<client>/rules.md')
+    .description('Add a business rule to harness/memory/rules.md')
     .action(async () => {
-      const clientName = requireClient();
-
       console.log('');
-      console.log(chalk.bold('Add business rule') + chalk.dim(`  ·  ${clientName}`));
+      console.log(chalk.bold('Add business rule'));
       console.log(chalk.dim('─'.repeat(42)));
 
       const rule = await input({ message: 'Rule:' });
@@ -33,20 +21,18 @@ export function registerMemoryCommands(program: Command): void {
       const tagsRaw = await input({ message: 'Tags (comma-separated):', default: '' });
       const tags = tagsRaw.split(',').map((t) => t.trim()).filter(Boolean);
 
-      appendRule(clientName, rule, context, tags);
+      appendRule(rule, context, tags);
       console.log('');
-      success(`Rule added  ·  harness/memory/${clientName}/rules.md`);
+      success('Rule added  ·  harness/memory/rules.md');
     });
 
   // ── add-feature ───────────────────────────────────────────────────────────
   cmd
     .command('add-feature')
-    .description('Add a product feature to harness/memory/<client>/features.md')
+    .description('Add a product feature to harness/memory/features.md')
     .action(async () => {
-      const clientName = requireClient();
-
       console.log('');
-      console.log(chalk.bold('Add feature') + chalk.dim(`  ·  ${clientName}`));
+      console.log(chalk.bold('Add feature'));
       console.log(chalk.dim('─'.repeat(42)));
 
       const name = await input({ message: 'Name:' });
@@ -54,38 +40,34 @@ export function registerMemoryCommands(program: Command): void {
       const tagsRaw = await input({ message: 'Tags (comma-separated):', default: '' });
       const tags = tagsRaw.split(',').map((t) => t.trim()).filter(Boolean);
 
-      appendFeature(clientName, name, description, tags);
+      appendFeature(name, description, tags);
       console.log('');
-      success(`Feature added  ·  harness/memory/${clientName}/features.md`);
+      success('Feature added  ·  harness/memory/features.md');
     });
 
   // ── add-convention ────────────────────────────────────────────────────────
   cmd
     .command('add-convention')
-    .description('Add a test convention to harness/memory/<client>/conventions.md')
+    .description('Add a test convention to harness/memory/conventions.md')
     .action(async () => {
-      const clientName = requireClient();
-
       console.log('');
-      console.log(chalk.bold('Add test convention') + chalk.dim(`  ·  ${clientName}`));
+      console.log(chalk.bold('Add test convention'));
       console.log(chalk.dim('─'.repeat(42)));
 
       const convention = await input({ message: 'Convention:' });
 
-      appendConvention(clientName, convention);
+      appendConvention(convention);
       console.log('');
-      success(`Convention added  ·  harness/memory/${clientName}/conventions.md`);
+      success('Convention added  ·  harness/memory/conventions.md');
     });
 
   // ── show ──────────────────────────────────────────────────────────────────
   cmd
     .command('show')
-    .description('Display current client memory files')
+    .description('Display current project memory files')
     .action(() => {
-      const clientName = requireClient();
-
       console.log('');
-      console.log(chalk.green('●') + ' ' + chalk.bold(clientName) + chalk.dim('  ·  harness/memory'));
+      console.log(chalk.bold('Project memory') + chalk.dim('  ·  harness/memory'));
       console.log(chalk.dim('─'.repeat(42)));
 
       for (const [label, filename] of [
@@ -93,7 +75,7 @@ export function registerMemoryCommands(program: Command): void {
         ['Features', 'features.md'],
         ['Test Conventions', 'conventions.md'],
       ] as const) {
-        const content = readMemoryFile(clientName, filename);
+        const content = readMemoryFile(filename);
         console.log('');
         console.log(chalk.bold(label));
         if (!content) {
@@ -107,5 +89,6 @@ export function registerMemoryCommands(program: Command): void {
       }
 
       console.log('');
+      hint('Edit these files directly, or use qai memory add-rule / add-feature / add-convention.');
     });
 }

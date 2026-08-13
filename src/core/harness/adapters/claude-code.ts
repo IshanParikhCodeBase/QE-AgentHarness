@@ -7,15 +7,14 @@ const DEFAULT_MODEL = 'claude-sonnet-4-6';
 function memoryPreamble(memoryPath: string): string {
   return `## Memory Access
 
-Client business rules, features, and test conventions are stored in \`${memoryPath}/\`.
-Before drafting, use the **Read** tool to load the relevant client subfolder.
+Business rules, features, and test conventions are stored in \`${memoryPath}/\`.
+Before drafting, use the **Read** tool to load them.
 
-Example:
-- \`${memoryPath}/<client>/rules.md\` — business rules
-- \`${memoryPath}/<client>/features.md\` — product features
-- \`${memoryPath}/<client>/conventions.md\` — test conventions
+- \`${memoryPath}/rules.md\` — business rules
+- \`${memoryPath}/features.md\` — product features
+- \`${memoryPath}/conventions.md\` — test conventions
 
-Read all three files before generating test cases. If the folder is empty, draft from the feature description alone.
+Read all three files before generating test cases. If they are empty or missing, draft from the feature description alone.
 
 ---
 

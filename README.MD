@@ -6,7 +6,7 @@ A CLI tool for setting up and managing QA agents across AI coding platforms. Eng
 
 ## How it works
 
-Agent definitions are written once in a neutral format (`agents/*.md`). `qai` translates them into the native format each platform expects. Client business rules and constraints live in `harness/memory/` — plain markdown files committed to the repo so the whole team shares the same context.
+Agent definitions are written once in a neutral format (`agents/*.md`). `qai` translates them into the native format each platform expects. Business rules and constraints live in `harness/memory/` — plain markdown files committed to the repo so the whole team shares the same context.
 
 ```
 agents/
@@ -14,10 +14,9 @@ agents/
 
 harness/
 └── memory/
-    └── <client>/
-        ├── rules.md            ← business rules
-        ├── features.md         ← product features
-        └── conventions.md      ← test conventions
+    ├── rules.md                ← business rules
+    ├── features.md             ← product features
+    └── conventions.md          ← test conventions
 ```
 
 ---
@@ -45,7 +44,7 @@ npm link
 
 ### Step 1 — Initialise the harness for your platform
 
-Run this from the root of your client project:
+Run this from the root of your project:
 
 ```bash
 qai harness init --provider claude-code    # Claude Code
@@ -62,32 +61,26 @@ git commit -m "add qai harness"
 
 Teammates who pull this get the agent immediately — no setup required on their end.
 
-### Step 2 — Set the active client
-
-```bash
-qai context set acme-corp
-```
-
-### Step 3 — Add client business rules
+### Step 2 — Add business rules
 
 ```bash
 qai memory add-rule
 ```
 
-The CLI prompts you for the rule, when it applies, and optional tags. Rules are written directly to `harness/memory/acme-corp/rules.md`. Commit them:
+The CLI prompts you for the rule, when it applies, and optional tags. Rules are written directly to `harness/memory/rules.md`. Commit them:
 
 ```bash
 git add harness/memory/
-git commit -m "add acme-corp business rules"
+git commit -m "add business rules"
 ```
 
-### Step 4 — Use the agent
+### Step 3 — Use the agent
 
 Open your AI platform in the project and ask it to use the agent:
 
 > *"Use test-case-drafter to draft test cases for this feature: [paste feature description]"*
 
-The agent reads the memory files and produces structured test cases that already reflect your client's business rules.
+The agent reads the memory files and produces structured test cases that already reflect your business rules.
 
 ---
 
@@ -103,24 +96,16 @@ The agent reads the memory files and produces structured test cases that already
 
 Supported providers: `claude-code` · `codex` · `copilot`
 
-### `qai context`
-
-| Command | What it does |
-|---|---|
-| `context set <name>` | Set the active client (slugified, stored in `~/.qai/config.json`) |
-| `context show` | Show the active client |
-| `context list` | List all clients with memory in `harness/memory/` |
-
 ### `qai memory`
 
-All memory commands write directly to `harness/memory/<client>/`. No sync step needed.
+All memory commands write directly to `harness/memory/`. No sync step needed.
 
 | Command | What it does |
 |---|---|
 | `memory add-rule` | Add a business rule interactively |
 | `memory add-feature` | Add a product feature interactively |
 | `memory add-convention` | Add a test convention interactively |
-| `memory show` | Display all memory files for the active client |
+| `memory show` | Display all memory files |
 
 ---
 
@@ -168,7 +153,7 @@ qai harness init --provider codex
 git add AGENTS.md && git commit -m "add codex agent config"
 ```
 
-The agent behaviour and all accumulated client memory carry over unchanged.
+The agent behaviour and all accumulated memory carry over unchanged.
 
 ---
 

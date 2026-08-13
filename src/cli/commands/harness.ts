@@ -54,24 +54,22 @@ function initMemoryDir(projectRoot: string): void {
       [
         '# Harness Memory',
         '',
-        'This directory holds per-client business rules, features, and test conventions.',
+        'This directory holds project business rules, features, and test conventions.',
         'Files here are version-controlled and read directly by agents at runtime.',
         '',
         '## Structure',
         '',
         '```',
         'harness/memory/',
-        '└── <client-slug>/',
-        '    ├── rules.md        — business rules and constraints',
-        '    ├── features.md     — product features',
-        '    └── conventions.md  — test conventions',
+        '├── rules.md        — business rules and constraints',
+        '├── features.md     — product features',
+        '└── conventions.md  — test conventions',
         '```',
         '',
         '## Adding memory',
         '',
-        '- **Via CLI (interactive):** `qai memory add-rule`',
-        '- **Via CLI (from a document):** `qai memory ingest <file>`',
-        '- **Manually:** create a subfolder and write markdown files directly',
+        '- **Via CLI (interactive):** `qai memory add-rule` / `add-feature` / `add-convention`',
+        '- **Manually:** edit the markdown files directly',
         '',
         'All files are plain markdown — commit them to version control so the whole team shares the same memory.',
       ].join('\n'),
@@ -115,7 +113,7 @@ export function registerHarnessCommands(program: Command): void {
       }
       console.log(`  ${chalk.green('✓')} harness/memory/`);
       console.log('');
-      hint('Next: set a client with  qai context set <name>  then  qai memory add-rule');
+      hint('Next: qai memory add-rule');
 
       if (target === 'claude-code') {
         hint('Restart Claude Code in this project to pick up the new subagent(s).');

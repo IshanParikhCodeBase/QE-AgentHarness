@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
 
-function getClientDir(clientName: string): string {
-  return path.join(process.cwd(), 'harness', 'memory', clientName);
+function getMemoryDir(): string {
+  return path.join(process.cwd(), 'harness', 'memory');
 }
 
-function ensureClientDir(clientName: string): string {
-  const dir = getClientDir(clientName);
+function ensureMemoryDir(): string {
+  const dir = getMemoryDir();
   fs.mkdirSync(dir, { recursive: true });
   return dir;
 }
@@ -19,12 +19,12 @@ function countHeaders(filePath: string, prefix: string): number {
 
 // ─── Rules ────────────────────────────────────────────────────────────────────
 
-export function appendRule(clientName: string, rule: string, context: string, tags: string[]): void {
-  const dir = ensureClientDir(clientName);
+export function appendRule(rule: string, context: string, tags: string[]): void {
+  const dir = ensureMemoryDir();
   const filePath = path.join(dir, 'rules.md');
 
   if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, `# Business Rules — ${clientName}\n`, 'utf8');
+    fs.writeFileSync(filePath, '# Business Rules\n', 'utf8');
   }
 
   const id = `BR-${String(countHeaders(filePath, 'BR-') + 1).padStart(3, '0')}`;
@@ -38,12 +38,12 @@ export function appendRule(clientName: string, rule: string, context: string, ta
 
 // ─── Features ─────────────────────────────────────────────────────────────────
 
-export function appendFeature(clientName: string, name: string, description: string, tags: string[]): void {
-  const dir = ensureClientDir(clientName);
+export function appendFeature(name: string, description: string, tags: string[]): void {
+  const dir = ensureMemoryDir();
   const filePath = path.join(dir, 'features.md');
 
   if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, `# Features — ${clientName}\n`, 'utf8');
+    fs.writeFileSync(filePath, '# Features\n', 'utf8');
   }
 
   const tagsLine = tags.length ? `\n\n**Tags:** ${tags.join(', ')}` : '';
@@ -52,12 +52,12 @@ export function appendFeature(clientName: string, name: string, description: str
 
 // ─── Conventions ──────────────────────────────────────────────────────────────
 
-export function appendConvention(clientName: string, convention: string): void {
-  const dir = ensureClientDir(clientName);
+export function appendConvention(convention: string): void {
+  const dir = ensureMemoryDir();
   const filePath = path.join(dir, 'conventions.md');
 
   if (!fs.existsSync(filePath)) {
-    fs.writeFileSync(filePath, `# Test Conventions — ${clientName}\n\n`, 'utf8');
+    fs.writeFileSync(filePath, '# Test Conventions\n\n', 'utf8');
   }
 
   fs.appendFileSync(filePath, `- ${convention}\n`, 'utf8');
@@ -65,21 +65,8 @@ export function appendConvention(clientName: string, convention: string): void {
 
 // ─── Read ─────────────────────────────────────────────────────────────────────
 
-export function readMemoryFile(
-  clientName: string,
-  filename: 'rules.md' | 'features.md' | 'conventions.md',
-): string | null {
-  const filePath = path.join(getClientDir(clientName), filename);
+export function readMemoryFile(filename: 'rules.md' | 'features.md' | 'conventions.md'): string | null {
+  const filePath = path.join(getMemoryDir(), filename);
   if (!fs.existsSync(filePath)) return null;
   return fs.readFileSync(filePath, 'utf8');
-}
-
-// ─── Clients ──────────────────────────────────────────────────────────────────
-
-export function listClients(): string[] {
-  const memoryDir = path.join(process.cwd(), 'harness', 'memory');
-  if (!fs.existsSync(memoryDir)) return [];
-  return fs.readdirSync(memoryDir).filter((name) => {
-    return fs.statSync(path.join(memoryDir, name)).isDirectory();
-  });
 }
