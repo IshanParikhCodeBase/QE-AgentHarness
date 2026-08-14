@@ -1,8 +1,8 @@
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { input } from '@inquirer/prompts';
-import { appendRule, appendFeature, appendConvention, readMemoryFile } from '../../core/memory/store.js';
-import { success, hint } from '../ui.js';
+import { appendRule, appendFeature, appendConvention } from '../../core/memory/store.js';
+import { success } from '../ui.js';
 
 export function registerMemoryCommands(program: Command): void {
   const cmd = program.command('memory').description('Manage project memory');
@@ -10,7 +10,7 @@ export function registerMemoryCommands(program: Command): void {
   // ── add-rule ──────────────────────────────────────────────────────────────
   cmd
     .command('add-rule')
-    .description('Add a business rule to harness/memory/rules.md')
+    .description('Add a business rule to memory/rules.md')
     .action(async () => {
       console.log('');
       console.log(chalk.bold('Add business rule'));
@@ -23,13 +23,13 @@ export function registerMemoryCommands(program: Command): void {
 
       appendRule(rule, context, tags);
       console.log('');
-      success('Rule added  ·  harness/memory/rules.md');
+      success('Rule added  ·  memory/rules.md');
     });
 
   // ── add-feature ───────────────────────────────────────────────────────────
   cmd
     .command('add-feature')
-    .description('Add a product feature to harness/memory/features.md')
+    .description('Add a product feature to memory/features.md')
     .action(async () => {
       console.log('');
       console.log(chalk.bold('Add feature'));
@@ -42,13 +42,13 @@ export function registerMemoryCommands(program: Command): void {
 
       appendFeature(name, description, tags);
       console.log('');
-      success('Feature added  ·  harness/memory/features.md');
+      success('Feature added  ·  memory/features.md');
     });
 
   // ── add-convention ────────────────────────────────────────────────────────
   cmd
     .command('add-convention')
-    .description('Add a test convention to harness/memory/conventions.md')
+    .description('Add a test convention to memory/conventions.md')
     .action(async () => {
       console.log('');
       console.log(chalk.bold('Add test convention'));
@@ -58,37 +58,6 @@ export function registerMemoryCommands(program: Command): void {
 
       appendConvention(convention);
       console.log('');
-      success('Convention added  ·  harness/memory/conventions.md');
-    });
-
-  // ── show ──────────────────────────────────────────────────────────────────
-  cmd
-    .command('show')
-    .description('Display current project memory files')
-    .action(() => {
-      console.log('');
-      console.log(chalk.bold('Project memory') + chalk.dim('  ·  harness/memory'));
-      console.log(chalk.dim('─'.repeat(42)));
-
-      for (const [label, filename] of [
-        ['Business Rules', 'rules.md'],
-        ['Features', 'features.md'],
-        ['Test Conventions', 'conventions.md'],
-      ] as const) {
-        const content = readMemoryFile(filename);
-        console.log('');
-        console.log(chalk.bold(label));
-        if (!content) {
-          console.log(chalk.dim('  none yet'));
-        } else {
-          for (const line of content.split('\n').slice(1)) {
-            if (line.trim() === '') continue;
-            console.log('  ' + chalk.dim(line));
-          }
-        }
-      }
-
-      console.log('');
-      hint('Edit these files directly, or use qai memory add-rule / add-feature / add-convention.');
+      success('Convention added  ·  memory/conventions.md');
     });
 }

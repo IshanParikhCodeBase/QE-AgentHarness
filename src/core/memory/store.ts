@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 function getMemoryDir(): string {
-  return path.join(process.cwd(), 'harness', 'memory');
+  return path.join(process.cwd(), 'memory');
 }
 
 function ensureMemoryDir(): string {
@@ -61,12 +61,4 @@ export function appendConvention(convention: string): void {
   }
 
   fs.appendFileSync(filePath, `- ${convention}\n`, 'utf8');
-}
-
-// ─── Read ─────────────────────────────────────────────────────────────────────
-
-export function readMemoryFile(filename: 'rules.md' | 'features.md' | 'conventions.md'): string | null {
-  const filePath = path.join(getMemoryDir(), filename);
-  if (!fs.existsSync(filePath)) return null;
-  return fs.readFileSync(filePath, 'utf8');
 }

@@ -46,7 +46,7 @@ export function loadAgentDefs(dir: string): NeutralAgentDef[] {
       models: fm.models ?? {},
       tools: fm.tools ?? [],
       maxTokens: fm.max_tokens ?? 4096,
-      memoryPath: fm.memory_path ?? './harness/memory',
+      memoryPath: fm.memory_path ?? './memory',
       outputPath: fm.output_path ?? './test-cases',
       systemPrompt: body,
     });

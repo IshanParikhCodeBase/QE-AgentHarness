@@ -9,7 +9,7 @@ export interface NeutralAgentDef {
   /** Neutral tool names: read_memory, file_write */
   tools: string[];
   maxTokens: number;
-  /** Relative path where harness memory files live, e.g. ./harness/memory */
+  /** Relative path where memory files live, e.g. ./memory */
   memoryPath: string;
   /** Default output directory for agent artifacts, e.g. ./test-cases */
   outputPath: string;

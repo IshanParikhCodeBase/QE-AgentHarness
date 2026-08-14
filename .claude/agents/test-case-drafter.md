@@ -9,12 +9,12 @@ tools: [Read, Write]
 
 ## Memory Access
 
-Business rules, features, and test conventions are stored in `./harness/memory/`.
+Business rules, features, and test conventions are stored in `./memory/`.
 Before drafting, use the **Read** tool to load them.
 
-- `./harness/memory/rules.md` — business rules
-- `./harness/memory/features.md` — product features
-- `./harness/memory/conventions.md` — test conventions
+- `./memory/rules.md` — business rules
+- `./memory/features.md` — product features
+- `./memory/conventions.md` — test conventions
 
 Read all three files before generating test cases. If they are empty or missing, draft from the feature description alone.
 

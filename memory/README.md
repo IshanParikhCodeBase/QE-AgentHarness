@@ -1,4 +1,4 @@
-# Harness Memory
+# Memory
 
 This directory holds project business rules, features, and test conventions.
 Files here are version-controlled and read directly by agents at runtime.
@@ -6,7 +6,7 @@ Files here are version-controlled and read directly by agents at runtime.
 ## Structure
 
 ```
-harness/memory/
+memory/
 ├── rules.md        — business rules and constraints
 ├── features.md     — product features
 └── conventions.md  — test conventions

@@ -6,17 +6,16 @@ A CLI tool for setting up and managing QA agents across AI coding platforms. Eng
 
 ## How it works
 
-Agent definitions are written once in a neutral format (`agents/*.md`). `qai` translates them into the native format each platform expects. Business rules and constraints live in `harness/memory/` — plain markdown files committed to the repo so the whole team shares the same context.
+Agent definitions are written once in a neutral format (`agents/*.md`). `qai` translates them into the native format each platform expects. Business rules and constraints live in `memory/` — plain markdown files committed to the repo so the whole team shares the same context.
 
 ```
 agents/
 └── test-case-drafter.md        ← neutral definition (source of truth)
 
-harness/
-└── memory/
-    ├── rules.md                ← business rules
-    ├── features.md             ← product features
-    └── conventions.md          ← test conventions
+memory/
+├── rules.md                    ← business rules
+├── features.md                 ← product features
+└── conventions.md              ← test conventions
 ```
 
 ---
@@ -52,10 +51,10 @@ qai harness init --provider codex          # OpenAI Codex
 qai harness init --provider copilot        # GitHub Copilot
 ```
 
-This generates the platform-native agent file(s) and creates the `harness/memory/` directory. Commit everything:
+This generates the platform-native agent file(s) and creates the `memory/` directory. Commit everything:
 
 ```bash
-git add .claude/ harness/    # (or AGENTS.md / .github/ depending on provider)
+git add .claude/ memory/    # (or AGENTS.md / .github/ depending on provider)
 git commit -m "add qai harness"
 ```
 
@@ -67,10 +66,10 @@ Teammates who pull this get the agent immediately — no setup required on their
 qai memory add-rule
 ```
 
-The CLI prompts you for the rule, when it applies, and optional tags. Rules are written directly to `harness/memory/rules.md`. Commit them:
+The CLI prompts you for the rule, when it applies, and optional tags. Rules are written directly to `memory/rules.md`. Commit them:
 
 ```bash
-git add harness/memory/
+git add memory/
 git commit -m "add business rules"
 ```
 
@@ -90,7 +89,7 @@ The agent reads the memory files and produces structured test cases that already
 
 | Command | What it does |
 |---|---|
-| `harness init --provider <name>` | Generate native agent files + initialise `harness/memory/` |
+| `harness init --provider <name>` | Generate native agent files + initialise `memory/` |
 | `harness generate --provider <name>` | Regenerate native files after editing an agent definition |
 | `harness list` | List all neutral agent definitions in `agents/` |
 
@@ -98,14 +97,13 @@ Supported providers: `claude-code` · `codex` · `copilot`
 
 ### `qai memory`
 
-All memory commands write directly to `harness/memory/`. No sync step needed.
+All memory commands write directly to `memory/`. No sync step needed.
 
 | Command | What it does |
 |---|---|
 | `memory add-rule` | Add a business rule interactively |
 | `memory add-feature` | Add a product feature interactively |
 | `memory add-convention` | Add a test convention interactively |
-| `memory show` | Display all memory files |
 
 ---
 
@@ -127,7 +125,7 @@ tools:
   - read_memory
   - file_write
 max_tokens: 4096
-memory_path: ./harness/memory
+memory_path: ./memory
 output_path: ./output
 ---
 

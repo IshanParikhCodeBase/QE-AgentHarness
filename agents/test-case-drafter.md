@@ -13,7 +13,7 @@ tools:
   - read_memory
   - file_write
 max_tokens: 4096
-memory_path: ./harness/memory
+memory_path: ./memory
 output_path: ./test-cases
 ---
 

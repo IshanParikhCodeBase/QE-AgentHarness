@@ -44,7 +44,7 @@ function writeFiles(files: { path: string; content: string }[], projectRoot: str
 }
 
 function initMemoryDir(projectRoot: string): void {
-  const memoryDir = path.join(projectRoot, 'harness', 'memory');
+  const memoryDir = path.join(projectRoot, 'memory');
   fs.mkdirSync(memoryDir, { recursive: true });
 
   const readme = path.join(memoryDir, 'README.md');
@@ -52,7 +52,7 @@ function initMemoryDir(projectRoot: string): void {
     fs.writeFileSync(
       readme,
       [
-        '# Harness Memory',
+        '# Memory',
         '',
         'This directory holds project business rules, features, and test conventions.',
         'Files here are version-controlled and read directly by agents at runtime.',
@@ -60,7 +60,7 @@ function initMemoryDir(projectRoot: string): void {
         '## Structure',
         '',
         '```',
-        'harness/memory/',
+        'memory/',
         '├── rules.md        — business rules and constraints',
         '├── features.md     — product features',
         '└── conventions.md  — test conventions',
@@ -86,7 +86,7 @@ export function registerHarnessCommands(program: Command): void {
   // ── harness init ──────────────────────────────────────────────────────────
   cmd
     .command('init')
-    .description('Initialise the harness for a provider: generate native agent files + memory dir')
+    .description('Initialise the agent harness for a provider: generate native agent files + memory dir')
     .requiredOption('-p, --provider <target>', `Provider to target (${VALID_PROVIDERS})`)
     .option('-r, --root <path>', 'Project root (defaults to cwd)')
     .action((opts: { provider: string; root?: string }) => {
@@ -111,7 +111,7 @@ export function registerHarnessCommands(program: Command): void {
       for (const f of written) {
         console.log(`  ${chalk.green('✓')} ${f}`);
       }
-      console.log(`  ${chalk.green('✓')} harness/memory/`);
+      console.log(`  ${chalk.green('✓')} memory/`);
       console.log('');
       hint('Next: qai memory add-rule');
 
