@@ -91,9 +91,14 @@ The agent reads the memory files and produces structured test cases that already
 |---|---|
 | `harness init --provider <name>` | Generate native agent files + initialise `memory/` |
 | `harness generate --provider <name>` | Regenerate native files after editing an agent definition |
-| `harness list` | List all neutral agent definitions in `agents/` |
 
 Supported providers: `claude-code` · `codex` · `copilot`
+
+### `qai agent`
+
+| Command | What it does |
+|---|---|
+| `agent list` | List all neutral agent definitions in `agents/` |
 
 ### `qai memory`
 

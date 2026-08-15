@@ -148,34 +148,4 @@ export function registerHarnessCommands(program: Command): void {
       console.log('');
       success('Done');
     });
-
-  // ── harness list ──────────────────────────────────────────────────────────
-  cmd
-    .command('list')
-    .description('List all neutral agent definitions in agents/')
-    .option('-r, --root <path>', 'Project root (defaults to cwd)')
-    .action((opts: { root?: string }) => {
-      const projectRoot = resolveProjectRoot(opts.root);
-      const agentsDir = path.join(projectRoot, AGENTS_DIR);
-      const defs = loadAgentDefs(agentsDir);
-
-      console.log('');
-      console.log(chalk.bold('Agent definitions') + chalk.dim(`  ·  ${agentsDir}`));
-      console.log(chalk.dim('─'.repeat(42)));
-
-      if (defs.length === 0) {
-        console.log(chalk.dim('  none'));
-      } else {
-        for (const def of defs) {
-          console.log(`  ${chalk.green('●')} ${chalk.bold(def.name)}  ${chalk.dim('v' + def.version)}`);
-          console.log(`    ${chalk.dim(def.description)}`);
-          console.log(`    tools: ${chalk.dim(def.tools.join(', ') || 'none')}`);
-          const modelsSummary = Object.entries(def.models)
-            .map(([p, m]) => `${p}→${m}`)
-            .join(', ');
-          if (modelsSummary) console.log(`    models: ${chalk.dim(modelsSummary)}`);
-          console.log('');
-        }
-      }
-    });
 }
